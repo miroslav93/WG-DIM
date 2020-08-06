@@ -1,6 +1,0 @@
-requests==2.24.0
-urllib3==1.25.9
-beautifulsoup4==4.9.1
-colorama==0.4.3
-fastapi==0.60.1
-uvicorn==0.11.8
