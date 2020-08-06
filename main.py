@@ -2,6 +2,8 @@ import requests
 from urllib.parse import urlparse, urljoin
 from bs4 import BeautifulSoup
 import colorama
+from fastapi import BackgroundTasks, FastAPI
+from pydantic import BaseModel
 
 # init the colorama module
 colorama.init()
@@ -9,6 +11,8 @@ GREEN = colorama.Fore.GREEN
 GRAY = colorama.Fore.LIGHTBLACK_EX
 RESET = colorama.Fore.RESET
 
+# initialize api
+app = FastAPI()
 
 # initialize the set of links (unique links)
 internal_urls = set()
@@ -75,8 +79,16 @@ def crawl(url, max_urls=50):
             break
         crawl(link, max_urls=max_urls)
 
-if __name__ == "__main__":
-    crawl("https://gitlab.com")
-    print("[+] Total External links:", len(external_urls))
-    print("[+] Total Internal links:", len(internal_urls))
-    print("[+] Total:", len(external_urls) + len(internal_urls))
+# if __name__ == "__main__":
+#     crawl("gitlab.com")
+#     print("[+] Total External links:", len(external_urls))
+#     print("[+] Total Internal links:", len(internal_urls))
+#     print("[+] Total:", len(external_urls) + len(internal_urls))
+
+class UrlInput(BaseModel):
+    url: str
+
+@app.post("/send-url/")
+async def send_url(data: UrlInput, background_tasks: BackgroundTasks):
+    background_tasks.add_task(crawl, data.url)
+    return {print("[+] Total:", len(external_urls) + len(internal_urls))}
